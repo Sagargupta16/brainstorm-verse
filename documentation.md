@@ -28,4 +28,18 @@ svix : Svix is a service for sending webhooks. It provides a simple API for send
 ### Setting Up app Details 
 
 - Delete all Content inside main tag in app/page.tsx
-- Customize app/global.css & tailwind.config.js According to your need
+- Customize app/global.css & tailwind.config.js According to your need also install tailwindcss-animate
+
+```bash
+npm install tailwindcss-animate
+```
+
+
+### Setting up Folder Structure
+
+- Route Groups : Auth, Root 
+    - Auth : Signin, Signup, onboarding
+    - Root : layout, pages
+
+- Create a folder named "auth" inside pages folder and create a folder named "signin" inside auth folder and create a file named "index.tsx" inside signin folder
+
