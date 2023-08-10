@@ -53,3 +53,7 @@ CLERK_FRONTEND_API_KEY=clerk.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 Then Follow the steps on Clerk Documentation to setup Clerk in your app.
 
 ### Setting up UploadThing
+
+link : https://www.youtube.com/watch?v=O5cmLDVTgAs&list=WL&index=4&t=215s
+
+3:13:58 / 5:50:34
