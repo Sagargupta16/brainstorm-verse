@@ -22,7 +22,7 @@
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "lucide-react": "^0.266.0",
+    "lucide-react": "^0.267.0",
     "mongoose": "^7.4.2",
     "next": "13.4.13",
     "postcss": "8.4.27",
