@@ -15,7 +15,7 @@
     "@hookform/resolvers": "^3.2.0",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
-    "@types/node": "20.10.0",
+    "@types/node": "20.10.1",
     "@types/react": "18.2.39",
     "@types/react-dom": "18.2.17",
     "@uploadthing/react": "^6.0.0",
