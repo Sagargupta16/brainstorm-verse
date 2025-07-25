@@ -39,7 +39,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "eslint": "9.10.0",
+    "eslint": "9.32.0",
     "eslint-config-next": "14.2.24",
     "prettier": "3.3.3"
   }
