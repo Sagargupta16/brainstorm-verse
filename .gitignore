@@ -36,3 +36,12 @@ next-env.d.ts
 
 # Environment
 .env
+
+# Added for consistency
+.env.local
+.env.*.local
+*.log
+Thumbs.db
+node_modules/
+dist/
+.next/
