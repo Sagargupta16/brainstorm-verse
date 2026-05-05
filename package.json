@@ -15,19 +15,19 @@
     "@hookform/resolvers": "^3.2.0",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
-    "@types/node": "20.19.33",
-    "@types/react": "18.3.27",
+    "@types/node": "20.19.39",
+    "@types/react": "18.3.28",
     "@types/react-dom": "18.3.7",
     "@uploadthing/react": "^6.6.0",
-    "autoprefixer": "10.4.27",
+    "autoprefixer": "10.5.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "lucide-react": "^0.575.0",
+    "lucide-react": "^0.577.0",
     "mongoose": "^8.0.0",
-    "next": "16.2.3",
-    "postcss": "8.5.10",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "next": "16.2.4",
+    "postcss": "8.5.14",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
     "react-hook-form": "^7.45.4",
     "svix": "^1.8.0",
     "tailwind-merge": "^2.0.0",
@@ -39,8 +39,8 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "eslint": "10.0.2",
-    "eslint-config-next": "16.1.6",
-    "prettier": "3.6.2"
+    "eslint": "10.3.0",
+    "eslint-config-next": "16.2.4",
+    "prettier": "3.8.3"
   }
 }
