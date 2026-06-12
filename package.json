@@ -26,7 +26,7 @@
     "lucide-react": "^0.577.0",
     "mongoose": "^8.0.0",
     "next": "^16.2.9",
-    "postcss": "8.5.15",
+    "postcss": "^8.5.10",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "react-hook-form": "^7.45.4",
@@ -47,6 +47,6 @@
     "uuid": "^11.1.1",
     "js-cookie": "^3.0.7",
     "@clerk/clerk-react": "^5.61.6",
-    "postcss": "^8.5.10"
+    "postcss": "$postcss"
   }
 }
