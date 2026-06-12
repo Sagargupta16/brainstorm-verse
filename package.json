@@ -46,6 +46,7 @@
   "overrides": {
     "uuid": "^11.1.1",
     "js-cookie": "^3.0.7",
-    "@clerk/clerk-react": "^5.61.6"
+    "@clerk/clerk-react": "^5.61.6",
+    "postcss": "^8.5.10"
   }
 }
