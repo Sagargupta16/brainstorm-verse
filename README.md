@@ -2,25 +2,23 @@
 
 A modern idea-sharing platform where creativity meets collaboration. Share your thoughts, discover innovative ideas, and connect with like-minded creators in a beautifully designed interface.
 
-![Next.js](https://img.shields.io/badge/Next.js-14.2.32-black?style=flat-square&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7.3-blue?style=flat-square&logo=typescript)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.10-38B2AC?style=flat-square&logo=tailwind-css)
-![MongoDB](https://img.shields.io/badge/MongoDB-8.0.0-green?style=flat-square&logo=mongodb)
+![Next.js](https://img.shields.io/badge/Next.js-16.2.4-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue?style=flat-square&logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.19-38B2AC?style=flat-square&logo=tailwind-css)
+![Mongoose](https://img.shields.io/badge/Mongoose-8.x-green?style=flat-square&logo=mongoose)
 
 ## ✨ Features
 
 - 🔐 **Secure Authentication** - Powered by Clerk for seamless user management
 - 💭 **Idea Sharing** - Create and share your innovative ideas with the community
-- 👤 **User Profiles** - Personalized profiles with onboarding experience
-- 💬 **Comments & Discussions** - Engage with others through threaded conversations
+- 👤 **Profile Onboarding** - Set up your profile with a guided onboarding experience
 - 📱 **Responsive Design** - Beautiful UI that works on all devices
 - 🎨 **Modern Interface** - Clean design with TailwindCSS and shadcn/ui components
-- 📁 **File Uploads** - Share images and files with your ideas using UploadThing
-- 🔍 **Real-time Updates** - Stay connected with live content updates
+- 📁 **Photo Uploads** - Upload your profile photo using UploadThing
 
 ## 🚀 Tech Stack
 
-- **Framework**: [Next.js 14](https://nextjs.org/) with App Router
+- **Framework**: [Next.js 16](https://nextjs.org/) with App Router
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [TailwindCSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
 - **Authentication**: [Clerk](https://clerk.com/)
@@ -33,7 +31,7 @@ A modern idea-sharing platform where creativity meets collaboration. Share your 
 
 ### Prerequisites
 
-- Node.js 18.17 or later
+- Node.js 20.9 or later
 - npm, yarn, or pnpm
 - MongoDB database
 - Clerk account for authentication
@@ -106,21 +104,21 @@ brainstorm-verse/
 │   ├── forms/            # Form components
 │   ├── shared/           # Shared layout components
 │   └── ui/               # shadcn/ui components
+├── constants/            # Navigation and tab constants
 ├── lib/
 │   ├── actions/          # Server actions
 │   ├── models/           # Database models
 │   ├── validations/      # Zod schemas
-│   └── utils/            # Utility functions
+│   └── utils.ts          # Utility functions
 └── public/               # Static assets
 ```
 
 ## 🎯 Usage
 
 1. **Sign Up/Sign In**: Create an account or log in using Clerk authentication
-2. **Complete Onboarding**: Set up your profile with basic information
+2. **Complete Onboarding**: Set up your profile with basic information and a photo
 3. **Create Ideas**: Share your thoughts and innovations with the community
-4. **Explore**: Browse ideas from other users and engage through comments
-5. **Profile Management**: Update your profile and view your activity
+4. **Explore**: Browse ideas from other users on the home feed
 
 ## 🔧 Available Scripts
 
