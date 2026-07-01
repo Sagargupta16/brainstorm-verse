@@ -1,5 +1,5 @@
 import { fetchPosts } from "@/lib/actions/idea.action";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import IdeaCard from "@/components/cards/IdeaCard";
 
 export default async function Home() {
