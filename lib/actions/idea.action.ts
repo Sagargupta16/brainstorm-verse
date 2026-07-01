@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import Idea from "../models/idea.model";
 import User from "../models/user.model";
@@ -15,6 +16,14 @@ interface Params {
 export async function createIdea({ text, author, communityId, path }: Params) {
   try {
     connectToDB();
+
+    const { userId: sessionUserId } = auth();
+    if (!sessionUserId) throw new Error("Unauthorized");
+
+    const sessionUser = await User.findOne({ id: sessionUserId }).select("_id");
+    if (!sessionUser || String(sessionUser._id) !== String(author)) {
+      throw new Error("Unauthorized");
+    }
 
     const createdIdea = await Idea.create({
       text,
