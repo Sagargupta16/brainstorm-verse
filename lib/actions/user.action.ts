@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@clerk/nextjs/server";
 import { connectToDB } from "../mongoose";
 import User from "../models/user.model";
 import { revalidatePath } from "next/cache";
@@ -21,6 +22,11 @@ export async function updateUser({
   bio,
   path,
 }: Params): Promise<void> {
+  const { userId: sessionUserId } = auth();
+  if (!sessionUserId || sessionUserId !== userId) {
+    throw new Error("Unauthorized");
+  }
+
   connectToDB();
 
   try {
@@ -36,7 +42,7 @@ export async function updateUser({
       { upsert: true },
     );
 
-    if (path === "/prfile/edit") {
+    if (path === "/profile/edit") {
       revalidatePath(path);
     }
   } catch (error: any) {
