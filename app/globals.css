@@ -1,117 +1,257 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@layer components {
-  /* main */
-  .main-container {
-    @apply flex min-h-screen flex-1 flex-col items-center bg-dark-1 px-6 pb-10 pt-28 max-md:pb-32 sm:px-10;
+@plugin 'tailwindcss-animate';
+
+@custom-variant dark (&:is(.dark *));
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= --theme(--breakpoint-xs)) {
+    max-width: none;
   }
-
-  /* Head Text */
-  .head-text {
-    @apply text-heading2-bold text-light-1;
-  }
-
-  /* Activity */
-  .activity-card {
-    @apply flex items-center gap-2 rounded-md bg-dark-2 px-7 py-4;
-  }
-
-  /* No Result */
-  .no-result {
-    @apply text-center !text-base-regular text-light-3;
-  }
-
-  /* Community Card */
-  .community-card {
-    @apply w-full rounded-lg bg-dark-3 px-4 py-5 sm:w-96;
-  }
-
-  .community-card_btn {
-    @apply rounded-lg bg-primary-500 px-5 py-1.5 text-small-regular !text-light-1 !important;
-  }
-
-  /* idea card  */
-  .idea-card_bar {
-    @apply relative mt-2 w-0.5 grow rounded-full bg-neutral-800;
-  }
-
-  /* User card */
-  .user-card {
-    @apply flex flex-col justify-between gap-4 max-xs:rounded-xl max-xs:bg-dark-3 max-xs:p-4 xs:flex-row xs:items-center;
-  }
-
-  .user-card_avatar {
-    @apply flex flex-1 items-start justify-start gap-3 xs:items-center;
-  }
-
-  .user-card_btn {
-    @apply h-auto min-w-[74px] rounded-lg bg-primary-500 text-[12px] text-light-1 !important;
-  }
-
-  .searchbar {
-    @apply flex gap-1 rounded-lg bg-dark-3 px-4 py-2;
-  }
-
-  .searchbar_input {
-    @apply border-none bg-dark-3 text-base-regular text-light-4 outline-none !important;
-  }
-
-  .topbar {
-    @apply fixed top-0 z-30 flex w-full items-center justify-between bg-dark-2 px-6 py-3;
-  }
-
-  .bottombar {
-    @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-glassmorphism p-4 backdrop-blur-lg xs:px-7 md:hidden;
-  }
-
-  .bottombar_container {
-    @apply flex items-center justify-between gap-3 xs:gap-5;
-  }
-
-  .bottombar_link {
-    @apply relative flex flex-col items-center gap-2 rounded-lg p-2 sm:flex-1 sm:px-2 sm:py-2.5;
-  }
-
-  .leftsidebar {
-    @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-r border-r-dark-4 bg-dark-2 pb-5 pt-28 max-md:hidden;
-  }
-
-  .leftsidebar_link {
-    @apply relative flex justify-start gap-4 rounded-lg p-4;
-  }
-
-  .pagination {
-    @apply mt-10 flex w-full items-center justify-center gap-5;
-  }
-
-  .rightsidebar {
-    @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-l border-l-dark-4 bg-dark-2 px-10 pb-6 pt-28 max-xl:hidden;
+  @media (width >= 1400px) {
+    max-width: 1400px;
   }
 }
 
-@layer utilities {
-  .css-invert {
-    @apply invert-[50%] brightness-200;
-  }
+@theme {
+  --text-*: initial;
+  --text-heading1-bold: 36px;
+  --text-heading1-bold--line-height: 140%;
+  --text-heading1-bold--font-weight: 700;
+  --text-heading1-semibold: 36px;
+  --text-heading1-semibold--line-height: 140%;
+  --text-heading1-semibold--font-weight: 600;
+  --text-heading2-bold: 30px;
+  --text-heading2-bold--line-height: 140%;
+  --text-heading2-bold--font-weight: 700;
+  --text-heading2-semibold: 30px;
+  --text-heading2-semibold--line-height: 140%;
+  --text-heading2-semibold--font-weight: 600;
+  --text-heading3-bold: 24px;
+  --text-heading3-bold--line-height: 140%;
+  --text-heading3-bold--font-weight: 700;
+  --text-heading4-medium: 20px;
+  --text-heading4-medium--line-height: 140%;
+  --text-heading4-medium--font-weight: 500;
+  --text-body-bold: 18px;
+  --text-body-bold--line-height: 140%;
+  --text-body-bold--font-weight: 700;
+  --text-body-semibold: 18px;
+  --text-body-semibold--line-height: 140%;
+  --text-body-semibold--font-weight: 600;
+  --text-body-medium: 18px;
+  --text-body-medium--line-height: 140%;
+  --text-body-medium--font-weight: 500;
+  --text-body-normal: 18px;
+  --text-body-normal--line-height: 140%;
+  --text-body-normal--font-weight: 400;
+  --text-body1-bold: 18px;
+  --text-body1-bold--line-height: 140%;
+  --text-body1-bold--font-weight: 700;
+  --text-base-regular: 16px;
+  --text-base-regular--line-height: 140%;
+  --text-base-regular--font-weight: 400;
+  --text-base-medium: 16px;
+  --text-base-medium--line-height: 140%;
+  --text-base-medium--font-weight: 500;
+  --text-base-semibold: 16px;
+  --text-base-semibold--line-height: 140%;
+  --text-base-semibold--font-weight: 600;
+  --text-base1-semibold: 16px;
+  --text-base1-semibold--line-height: 140%;
+  --text-base1-semibold--font-weight: 600;
+  --text-small-regular: 14px;
+  --text-small-regular--line-height: 140%;
+  --text-small-regular--font-weight: 400;
+  --text-small-medium: 14px;
+  --text-small-medium--line-height: 140%;
+  --text-small-medium--font-weight: 500;
+  --text-small-semibold: 14px;
+  --text-small-semibold--line-height: 140%;
+  --text-small-semibold--font-weight: 600;
+  --text-subtle-medium: 12px;
+  --text-subtle-medium--line-height: 16px;
+  --text-subtle-medium--font-weight: 500;
+  --text-subtle-semibold: 12px;
+  --text-subtle-semibold--line-height: 16px;
+  --text-subtle-semibold--font-weight: 600;
+  --text-tiny-medium: 10px;
+  --text-tiny-medium--line-height: 140%;
+  --text-tiny-medium--font-weight: 500;
+  --text-x-small-semibold: 7px;
+  --text-x-small-semibold--line-height: 9.318px;
+  --text-x-small-semibold--font-weight: 600;
 
-  .custom-scrollbar::-webkit-scrollbar {
+  --color-primary-500: #877eff;
+  --color-secondary-500: #ffb620;
+  --color-blue: #0095f6;
+  --color-logout-btn: #ff5a5a;
+  --color-navbar-menu: rgba(16, 16, 18, 0.6);
+  --color-dark-1: #000000;
+  --color-dark-2: #121417;
+  --color-dark-3: #101012;
+  --color-dark-4: #1f1f22;
+  --color-light-1: #ffffff;
+  --color-light-2: #efefef;
+  --color-light-3: #7878a3;
+  --color-light-4: #5c5c7b;
+  --color-gray-1: #697c89;
+  --color-glassmorphism: rgba(16, 16, 18, 0.6);
+
+  --shadow-count-badge: 0px 0px 6px 2px rgba(219, 188, 159, 0.3);
+  --shadow-groups-sidebar: -30px 0px 60px 0px rgba(28, 28, 31, 0.5);
+
+  --breakpoint-xs: 400px;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility main-container {
+  /* main */
+  @apply flex min-h-screen flex-1 flex-col items-center bg-dark-1 px-6 pb-10 pt-28 max-md:pb-32 sm:px-10;
+}
+
+@utility head-text {
+  /* Head Text */
+  @apply text-heading2-bold text-light-1;
+}
+
+@utility activity-card {
+  /* Activity */
+  @apply flex items-center gap-2 rounded-md bg-dark-2 px-7 py-4;
+}
+
+@utility no-result {
+  /* No Result */
+  @apply text-center text-base-regular! text-light-3;
+}
+
+@utility community-card {
+  /* Community Card */
+  @apply w-full rounded-lg bg-dark-3 px-4 py-5 sm:w-96;
+}
+
+@utility community-card_btn {
+  @apply rounded-lg! bg-primary-500! px-5! py-1.5! text-small-regular! text-light-1!;
+}
+
+@utility idea-card_bar {
+  /* idea card  */
+  @apply relative mt-2 w-0.5 grow rounded-full bg-neutral-800;
+}
+
+@utility user-card {
+  /* User card */
+  @apply flex flex-col justify-between gap-4 max-xs:rounded-xl max-xs:bg-dark-3 max-xs:p-4 xs:flex-row xs:items-center;
+}
+
+@utility user-card_avatar {
+  @apply flex flex-1 items-start justify-start gap-3 xs:items-center;
+}
+
+@utility user-card_btn {
+  @apply h-auto! min-w-[74px]! rounded-lg! bg-primary-500! text-[12px]! text-light-1!;
+}
+
+@utility searchbar {
+  @apply flex gap-1 rounded-lg bg-dark-3 px-4 py-2;
+}
+
+@utility searchbar_input {
+  @apply border-none! bg-dark-3! text-base-regular! text-light-4! outline-hidden!;
+}
+
+@utility topbar {
+  @apply fixed top-0 z-30 flex w-full items-center justify-between bg-dark-2 px-6 py-3;
+}
+
+@utility bottombar {
+  @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-glassmorphism p-4 backdrop-blur-lg xs:px-7 md:hidden;
+}
+
+@utility bottombar_container {
+  @apply flex items-center justify-between gap-3 xs:gap-5;
+}
+
+@utility bottombar_link {
+  @apply relative flex flex-col items-center gap-2 rounded-lg p-2 sm:flex-1 sm:px-2 sm:py-2.5;
+}
+
+@utility leftsidebar {
+  @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-r border-r-dark-4 bg-dark-2 pb-5 pt-28 max-md:hidden;
+}
+
+@utility leftsidebar_link {
+  @apply relative flex justify-start gap-4 rounded-lg p-4;
+}
+
+@utility pagination {
+  @apply mt-10 flex w-full items-center justify-center gap-5;
+}
+
+@utility rightsidebar {
+  @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-l border-l-dark-4 bg-dark-2 px-10 pb-6 pt-28 max-xl:hidden;
+}
+
+@utility css-invert {
+  @apply invert-50 brightness-200;
+}
+
+@utility custom-scrollbar {
+  &::-webkit-scrollbar {
     width: 3px;
     height: 3px;
     border-radius: 2px;
   }
 
-  .custom-scrollbar::-webkit-scrollbar-track {
+  &::-webkit-scrollbar-track {
     background: #09090a;
   }
 
-  .custom-scrollbar::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb {
     background: #5c5c7b;
     border-radius: 50px;
   }
 
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  &::-webkit-scrollbar-thumb:hover {
     background: #7878a3;
   }
 }
@@ -131,31 +271,31 @@
 
 /* Tab */
 .tab {
-  @apply flex min-h-[50px] flex-1 items-center gap-3 bg-dark-2 text-light-2 data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-2 !important;
+  @apply flex! min-h-[50px]! flex-1! items-center! gap-3! bg-dark-2! text-light-2! data-[state=active]:bg-[#0e0e12]! data-[state=active]:text-light-2!;
 }
 
 .no-focus {
-  @apply focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
+  @apply focus-visible:ring-0! focus-visible:ring-transparent! focus-visible:ring-offset-0!;
 }
 
 /* Account Profile  */
 .account-form_image-label {
-  @apply flex h-24 w-24 items-center justify-center rounded-full bg-dark-4 !important;
+  @apply flex! h-24! w-24! items-center! justify-center! rounded-full! bg-dark-4!;
 }
 
 .account-form_image-input {
-  @apply cursor-pointer border-none bg-transparent outline-none file:text-blue !important;
+  @apply cursor-pointer! border-none! bg-transparent! outline-hidden! file:text-blue!;
 }
 
 .account-form_input {
-  @apply border border-dark-4 bg-dark-3 text-light-1 !important;
+  @apply border! border-dark-4! bg-dark-3! text-light-1!;
 }
 
 /* Comment Form */
 .comment-form {
-  @apply mt-10 flex items-center gap-4 border-y border-y-dark-4 py-5 max-xs:flex-col !important;
+  @apply mt-10! flex! items-center! gap-4! border-y! border-y-dark-4! py-5! max-xs:flex-col!;
 }
 
 .comment-form_btn {
-  @apply rounded-3xl bg-primary-500 px-8 py-2 !text-small-regular text-light-1 max-xs:w-full !important;
+  @apply rounded-3xl! bg-primary-500! px-8! py-2! text-small-regular! text-light-1! max-xs:w-full!;
 }

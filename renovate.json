@@ -1,1 +1,10 @@
-{"$schema":"https://docs.renovatebot.com/renovate-schema.json","extends":["github>Sagargupta16/shared-workflows"]}
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>Sagargupta16/shared-workflows"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major"],
+      "enabled": true
+    }
+  ]
+}

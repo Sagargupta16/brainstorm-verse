@@ -7,24 +7,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.0.0",
+    "@clerk/nextjs": "^7.0.0",
     "@clerk/themes": "^2.0.0",
     "@hookform/resolvers": "^3.2.0",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
+    "@tailwindcss/postcss": "^4.3.2",
     "@types/node": "20.19.41",
     "@types/react": "18.3.29",
     "@types/react-dom": "18.3.7",
-    "@uploadthing/react": "^6.6.0",
-    "autoprefixer": "10.5.0",
+    "@uploadthing/react": "^7.3.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "lucide-react": "^0.577.0",
-    "mongoose": "^8.0.0",
+    "mongoose": "^9.0.0",
     "next": "^16.2.9",
     "postcss": "^8.5.10",
     "react": "19.2.6",
@@ -32,10 +32,10 @@
     "react-hook-form": "^7.45.4",
     "svix": "^1.8.0",
     "tailwind-merge": "^2.0.0",
-    "tailwindcss": "3.4.19",
+    "tailwindcss": "^4.3.2",
     "tailwindcss-animate": "^1.0.6",
     "typescript": "5.9.3",
-    "uploadthing": "^6.12.0",
+    "uploadthing": "^7.7.4",
     "zod": "^4.0.0"
   },
   "devDependencies": {
@@ -46,7 +46,6 @@
   "overrides": {
     "uuid": "^11.1.1",
     "js-cookie": "^3.0.7",
-    "@clerk/clerk-react": "^5.61.6",
     "postcss": "$postcss"
   }
 }

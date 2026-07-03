@@ -2,10 +2,10 @@
 
 A modern idea-sharing platform where creativity meets collaboration. Share your thoughts, discover innovative ideas, and connect with like-minded creators in a beautifully designed interface.
 
-![Next.js](https://img.shields.io/badge/Next.js-16.2.4-black?style=flat-square&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue?style=flat-square&logo=typescript)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.19-38B2AC?style=flat-square&logo=tailwind-css)
-![Mongoose](https://img.shields.io/badge/Mongoose-8.x-green?style=flat-square&logo=mongoose)
+![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=flat-square&logo=tailwind-css)
+![Mongoose](https://img.shields.io/badge/Mongoose-green?style=flat-square&logo=mongoose)
 
 ## ✨ Features
 
@@ -68,8 +68,7 @@ A modern idea-sharing platform where creativity meets collaboration. Share your 
    MONGODB_URL=your_mongodb_connection_string
    
    # UploadThing
-   UPLOADTHING_SECRET=your_uploadthing_secret
-   UPLOADTHING_APP_ID=your_uploadthing_app_id
+   UPLOADTHING_TOKEN=your_uploadthing_token
    ```
 
 4. **Run the development server**

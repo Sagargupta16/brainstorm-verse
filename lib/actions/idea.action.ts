@@ -17,7 +17,7 @@ export async function createIdea({ text, author, communityId, path }: Params) {
   try {
     connectToDB();
 
-    const { userId: sessionUserId } = auth();
+    const { userId: sessionUserId } = await auth();
     if (!sessionUserId) throw new Error("Unauthorized");
 
     const sessionUser = await User.findOne({ id: sessionUserId }).select("_id");

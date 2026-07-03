@@ -22,7 +22,7 @@ export async function updateUser({
   bio,
   path,
 }: Params): Promise<void> {
-  const { userId: sessionUserId } = auth();
+  const { userId: sessionUserId } = await auth();
   if (!sessionUserId || sessionUserId !== userId) {
     throw new Error("Unauthorized");
   }
