@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.1] - 2026-09-02
+
+- Override nanoid (^3.3.18), sharp (^0.35.0), and effect (^3.20.0) to fix 3 high-severity Dependabot alerts
+- Align package.json version with changelog
+- Record recent merged work: Clerk v7 / Mongoose v9 / UploadThing v7 / Tailwind v4 upgrades, profile edit cache revalidation fix, CI build workflow, MIT license switch, routine dependency updates
+
 ## [1.3.0] - 2026-03-14
 
 - Add .env.example and update .gitignore
