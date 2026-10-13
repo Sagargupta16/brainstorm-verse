@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.3] - 2026-10-13
+
+- Override sharp (^0.35.5), source-map-js (^1.2.2) and brace-expansion (1.1.21 and 5.0.12) to fix 4 Dependabot alerts raised by the rescan after 1.3.2 (#130, #131, #133, #134)
+
 ## [1.3.2] - 2026-10-13
 
 - Bump next to 16.4.0 (and eslint-config-next to match) to fix the critical remote code execution advisory in next/og ImageResponse (Dependabot alert #127)
