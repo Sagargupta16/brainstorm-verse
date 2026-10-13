@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.2] - 2026-10-13
+
+- Bump next to 16.4.0 (and eslint-config-next to match) to fix the critical remote code execution advisory in next/og ImageResponse (Dependabot alert #127)
+
 ## [1.3.1] - 2026-09-02
 
 - Override nanoid (^3.3.18), sharp (^0.35.0), and effect (^3.20.0) to fix 3 high-severity Dependabot alerts
