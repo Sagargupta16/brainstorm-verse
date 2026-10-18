@@ -4,7 +4,7 @@ import "../globals.css";
 
 export const metadata = {
   title: "BrainStormVerse",
-  description: "A Next.js 13 Meta Brainstorm-verse Application",
+  description: "Share ideas and browse a community feed",
 };
 
 const inter = Inter({ subsets: ["latin"] });
