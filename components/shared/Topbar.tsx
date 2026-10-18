@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Show, SignOutButton, OrganizationSwitcher } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { isDemoMode } from "@/lib/demo";
 
 function Topbar() {
   return (
@@ -12,30 +13,36 @@ function Topbar() {
           BrainStormVerse
         </p>
       </Link>
-      <div className="flex items-center gap-1">
-        <div className="block md:hidden">
-          <Show when="signed-in">
-            <SignOutButton>
-              <div className="flex cursor-pointer">
-                <Image
-                  src="/assets/logout.svg"
-                  alt="logout"
-                  width={24}
-                  height={24}
-                />
-              </div>
-            </SignOutButton>
-          </Show>
+      {isDemoMode ? (
+        <span className="rounded-full border border-primary-500 px-3 py-1 text-subtle-semibold text-light-1">
+          Demo mode
+        </span>
+      ) : (
+        <div className="flex items-center gap-1">
+          <div className="block md:hidden">
+            <Show when="signed-in">
+              <SignOutButton>
+                <div className="flex cursor-pointer">
+                  <Image
+                    src="/assets/logout.svg"
+                    alt="logout"
+                    width={24}
+                    height={24}
+                  />
+                </div>
+              </SignOutButton>
+            </Show>
+          </div>
+          <OrganizationSwitcher
+            appearance={{
+              theme: dark,
+              elements: {
+                organizationSwitcherTrigger: "py-2 px-4",
+              },
+            }}
+          />
         </div>
-        <OrganizationSwitcher
-          appearance={{
-            theme: dark,
-            elements: {
-              organizationSwitcherTrigger: "py-2 px-4",
-            },
-          }}
-        />
-      </div>
+      )}
     </nav>
   );
 }

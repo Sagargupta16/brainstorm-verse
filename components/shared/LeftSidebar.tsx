@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Show, SignOutButton } from "@clerk/nextjs";
+import { isDemoMode } from "@/lib/demo";
 
 function LeftSidebar() {
   const pathname = usePathname();
@@ -32,19 +33,21 @@ function LeftSidebar() {
         })}
       </div>
       <div className="mt-10 px-6">
-        <Show when="signed-in">
-          <SignOutButton redirectUrl="/sign-in">
-            <div className="flex cursor-pointer gap-4 p-4">
-              <Image
-                src="/assets/logout.svg"
-                alt="logout"
-                width={24}
-                height={24}
-              />
-              <p className="text-light-2 max-lg:hidden">Logout</p>
-            </div>
-          </SignOutButton>
-        </Show>
+        {!isDemoMode && (
+          <Show when="signed-in">
+            <SignOutButton redirectUrl="/sign-in">
+              <div className="flex cursor-pointer gap-4 p-4">
+                <Image
+                  src="/assets/logout.svg"
+                  alt="logout"
+                  width={24}
+                  height={24}
+                />
+                <p className="text-light-2 max-lg:hidden">Logout</p>
+              </div>
+            </SignOutButton>
+          </Show>
+        )}
       </div>
     </section>
   );

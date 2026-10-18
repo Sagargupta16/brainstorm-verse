@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.5.0] - 2026-10-18
+
+- Upvotes: new `Vote` model with a unique `(idea, user)` index, an idempotent `setVote` server action that moves `Idea.upvotes` with `$inc` only when a vote is inserted or deleted, and an optimistic `VoteButton` on every card
+- Feed sorts: Hot (default; `(upvotes + 1) / (ageHours + 2) ^ 1.8`, scored and sorted inside a MongoDB aggregation), New and Top, switched with `?sort=`; compound indexes on `Idea` for the feed, Top and profile queries
+- New pages: `/idea/[id]` (thread with replies and a reply form), `/profile/[id]` (Ideas and Replies tabs with idea, reply and upvote counts), `/profile` (redirects to your own), `/profile/edit`, `/activity` (replies to and upvotes on your ideas) and `/search` (people and ideas, regex input escaped)
+- Right sidebar "Suggested Users" now lists the most upvoted authors
+- Clerk webhook at `/api/webhook/clerk`: verifies the signature with `verifyWebhook` and, on `user.deleted`, removes the user, their ideas, the replies under them and the related votes, with upvote counters corrected
+- Demo mode (`NEXT_PUBLIC_DEMO_MODE=true`) runs the app without Clerk as a seeded Demo Visitor; `npm run demo` starts an in-memory MongoDB, seeds it and runs `next dev`
+- `npm run seed` loads the demo dataset (9 users, 12 ideas, 16 replies, 53 upvotes) into `MONGODB_URL`, replacing the seed-owned users and their ideas (replies and votes under those ideas go with them)
+- `npm run screenshots` captures desktop and phone screenshots with Playwright into `docs/screenshots/` as WebP; README now shows them
+- Pages and actions read the session through `lib/session.ts`; `proxy.ts` makes idea, profile and search pages public to read
+- Fix `/create-idea` passing a Mongo ObjectId to a client component (React rejected it); it now passes the id string
+- Profile photo validation also accepts site-relative image paths, so seeded profiles can be edited
+- IdeaCard: reply count with reply avatars, timestamp, "Replying to" link, wrapped long text and tighter padding on phones
+- README: demo quick start, screenshots, Deploy with Vercel button, voting and ranking design, demo mode notes, updated architecture diagram and data model
+- Dev dependencies: tsx, mongodb-memory-server-core, playwright, sharp
+
 ## [1.4.0] - 2026-10-18
 
 - Fix a stray `;` rendered under the home feed and pass the real `parentID` field to `IdeaCard`

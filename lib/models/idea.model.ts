@@ -24,7 +24,18 @@ const ideaSchema = new mongoose.Schema({
       ref: "Idea",
     },
   ],
+  // Denormalised count of Vote documents, kept in step with $inc so feeds
+  // can sort by it without a join
+  upvotes: {
+    type: Number,
+    default: 0,
+  },
 });
+
+// Feed (top-level ideas newest first), "top" sort, and per-author profile tabs
+ideaSchema.index({ parentID: 1, createdAt: -1 });
+ideaSchema.index({ parentID: 1, upvotes: -1, createdAt: -1 });
+ideaSchema.index({ author: 1, createdAt: -1 });
 
 const Idea = mongoose.models.Idea || mongoose.model("Idea", ideaSchema);
 

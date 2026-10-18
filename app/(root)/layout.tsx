@@ -1,4 +1,4 @@
-import { ClerkProvider } from "@clerk/nextjs";
+import AuthProvider from "@/components/shared/AuthProvider";
 import "../globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <AuthProvider>
       <html lang="en">
         <body className={inter.className}>
           <Topbar />
@@ -34,6 +34,6 @@ export default function RootLayout({
           <Bottombar />
         </body>
       </html>
-    </ClerkProvider>
+    </AuthProvider>
   );
 }

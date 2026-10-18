@@ -1,6 +1,6 @@
 {
   "name": "brainstorm-verse",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "demo": "tsx scripts/demo.ts",
+    "seed": "tsx scripts/seed.ts",
+    "screenshots": "tsx scripts/screenshots.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.17",
@@ -39,7 +42,11 @@
   "devDependencies": {
     "eslint": "10.13.0",
     "eslint-config-next": "16.4.2",
-    "prettier": "3.9.10"
+    "mongodb-memory-server-core": "11.3.0",
+    "playwright": "1.64.1",
+    "prettier": "3.9.10",
+    "sharp": "^0.35.5",
+    "tsx": "4.23.15"
   },
   "overrides": {
     "uuid": "^11.1.1",
