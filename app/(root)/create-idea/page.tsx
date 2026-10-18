@@ -1,20 +1,20 @@
 import PostIdea from "@/components/forms/PostIdea";
 import { fetchUser } from "@/lib/actions/user.action";
-import { currentUser } from "@clerk/nextjs/server";
+import { getSessionUserId } from "@/lib/session";
 import { redirect } from "next/navigation";
 
 async function Page() {
-  const user = await currentUser();
-  if (!user) return null;
+  const userId = await getSessionUserId();
+  if (!userId) return null;
 
-  const userInfo = await fetchUser(user.id);
+  const userInfo = await fetchUser(userId);
 
   if (!userInfo?.onboarded) redirect("/onboarding");
 
   return (
     <>
       <h1 className="head-text">Create Idea</h1>
-      <PostIdea userId={userInfo._id} />
+      <PostIdea userId={String(userInfo._id)} />
     </>
   );
 }
