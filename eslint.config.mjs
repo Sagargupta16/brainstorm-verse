@@ -10,7 +10,7 @@ const eslintConfig = [
     // eslint-plugin-react's version auto-detect breaks on ESLint 10
     settings: {
       react: {
-        version: "19.2.6",
+        version: "19.3.1",
       },
     },
   },
