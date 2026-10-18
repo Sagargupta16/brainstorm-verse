@@ -1,36 +1,48 @@
+import Link from "next/link";
+import IdeaList from "@/components/cards/IdeaList";
 import { fetchPosts } from "@/lib/actions/idea.action";
-import { currentUser } from "@clerk/nextjs/server";
-import IdeaCard from "@/components/cards/IdeaCard";
+import { FEED_SORTS, parseFeedSort } from "@/lib/ranking";
+import { getViewer } from "@/lib/viewer";
 
-export default async function Home() {
-  const result = await fetchPosts(1, 30);
-  const user = await currentUser();
+const SORT_LABELS = { hot: "Hot", new: "New", top: "Top" } as const;
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string }>;
+}) {
+  const sort = parseFeedSort((await searchParams).sort);
+  const [result, viewer] = await Promise.all([
+    fetchPosts(1, 30, sort),
+    getViewer(),
+  ]);
 
   return (
     <>
-      <h1 className="head-text text-left">Home</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="head-text text-left">Home</h1>
+        <nav
+          aria-label="Sort ideas"
+          className="flex rounded-full bg-dark-2 p-1"
+        >
+          {FEED_SORTS.map((option) => (
+            <Link
+              key={option}
+              href={option === "hot" ? "/" : `/?sort=${option}`}
+              aria-current={option === sort ? "page" : undefined}
+              className={`rounded-full px-4 py-1.5 text-small-semibold transition-colors ${
+                option === sort
+                  ? "bg-primary-500 text-light-1"
+                  : "text-light-3 hover:text-light-1"
+              }`}
+            >
+              {SORT_LABELS[option]}
+            </Link>
+          ))}
+        </nav>
+      </div>
       <section className="mt-9 flex flex-col gap-10">
-        {result.posts.length === 0 ? (
-          <div className="flex justify-center items-center">
-            <h1 className="text-2xl text-gray-500">No Posts</h1>
-          </div>
-        ) : (
-          <>
-            {result.posts.map((post) => (
-              <IdeaCard
-                key={post.id}
-                id={post.id}
-                currentUserId={user?.id || ""}
-                parentId={post.parentID}
-                content={post.text}
-                author={post.author}
-                community={post.community}
-                createdAt={post.createdAt}
-                comments={post.children}
-              />
-            ))}
-          </>
-        )}
+        <IdeaList ideas={result.posts} viewer={viewer} emptyText="No Posts" />
       </section>
     </>
   );
