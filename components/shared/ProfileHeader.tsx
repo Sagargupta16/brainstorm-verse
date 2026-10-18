@@ -10,7 +10,14 @@ interface Props {
   stats: { ideas: number; replies: number; upvotes: number };
 }
 
-function ProfileHeader({ name, username, image, bio, isOwner, stats }: Props) {
+function ProfileHeader({
+  name,
+  username,
+  image,
+  bio,
+  isOwner,
+  stats,
+}: Readonly<Props>) {
   const statItems = [
     { label: "Ideas", value: stats.ideas },
     { label: "Replies", value: stats.replies },

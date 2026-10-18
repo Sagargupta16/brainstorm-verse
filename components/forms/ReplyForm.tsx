@@ -19,7 +19,7 @@ interface Props {
   redirectTo: string | null;
 }
 
-function ReplyForm({ ideaId, currentUserImg, redirectTo }: Props) {
+function ReplyForm({ ideaId, currentUserImg, redirectTo }: Readonly<Props>) {
   const pathname = usePathname();
 
   const form = useForm({

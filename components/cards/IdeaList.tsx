@@ -16,7 +16,7 @@ async function IdeaList({
   viewer,
   isComment = false,
   emptyText,
-}: Props) {
+}: Readonly<Props>) {
   const visible = ideas.filter((idea) => idea.author);
   if (visible.length === 0) {
     return <p className="no-result">{emptyText}</p>;

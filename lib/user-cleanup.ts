@@ -13,6 +13,22 @@ export interface CleanupResult {
   votes: number;
 }
 
+// Add every reply below `frontier` to `doomed`, one thread level per query
+async function collectReplies(
+  frontier: string[],
+  doomed: Set<string>,
+): Promise<void> {
+  if (frontier.length === 0) return;
+  const replies = await Idea.find({ parentID: { $in: frontier } })
+    .select("_id")
+    .lean<{ _id: unknown }[]>();
+  const next = replies
+    .map((reply) => String(reply._id))
+    .filter((id) => !doomed.has(id));
+  next.forEach((id) => doomed.add(id));
+  return collectReplies(next, doomed);
+}
+
 /**
  * Remove a Clerk user from MongoDB: their profile, every idea they wrote, the
  * replies under those ideas (a thread without its root has nowhere to show),
@@ -32,16 +48,7 @@ export async function deleteUserData(
     .select("_id")
     .lean<{ _id: unknown }[]>();
   const doomed = new Set(authored.map((idea) => String(idea._id)));
-  let frontier = [...doomed];
-  while (frontier.length > 0) {
-    const replies = await Idea.find({ parentID: { $in: frontier } })
-      .select("_id")
-      .lean<{ _id: unknown }[]>();
-    frontier = replies
-      .map((reply) => String(reply._id))
-      .filter((id) => !doomed.has(id));
-    frontier.forEach((id) => doomed.add(id));
-  }
+  await collectReplies([...doomed], doomed);
   const doomedIds = [...doomed];
 
   // Their votes on ideas that survive: take each one back off the counter

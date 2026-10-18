@@ -17,10 +17,10 @@ const TABS = profileTabs.filter(
 export default async function ProfilePage({
   params,
   searchParams,
-}: {
+}: Readonly<{
   params: Promise<{ id: string }>;
   searchParams: Promise<{ tab?: string }>;
-}) {
+}>) {
   const { id } = await params;
   const activeTab =
     (await searchParams).tab === "replies" ? "replies" : "ideas";

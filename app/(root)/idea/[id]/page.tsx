@@ -6,9 +6,9 @@ import { getViewer } from "@/lib/viewer";
 
 export default async function IdeaPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<{ id: string }>;
-}) {
+}>) {
   const { id } = await params;
   const [idea, viewer] = await Promise.all([fetchIdeaById(id), getViewer()]);
   if (!idea?.author) notFound();

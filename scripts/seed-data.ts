@@ -1,13 +1,25 @@
 // Demo dataset: 9 people, 12 ideas, threaded replies and upvotes, with ages
 // spread over 9 days so the Hot, New and Top feeds each order differently.
 // All seeded users have Clerk-style ids starting "seed_" (plus the demo
-// visitor), and reseeding only ever deletes those users' data.
+// visitor). Reseeding deletes those users, their ideas and everything under
+// those ideas (deleteUserData), and nothing else.
+import mongoose from "mongoose";
 import Idea from "../lib/models/idea.model";
 import User from "../lib/models/user.model";
 import Vote from "../lib/models/vote.model";
 import { DEMO_USER_ID } from "../lib/demo";
 import { connectToDB } from "../lib/mongoose";
 import { deleteUserData } from "../lib/user-cleanup";
+
+interface IdeaDoc {
+  _id: mongoose.Types.ObjectId;
+  text: string;
+  author: unknown;
+  createdAt: Date;
+  parentID?: string;
+  upvotes?: number;
+  children: mongoose.Types.ObjectId[];
+}
 
 interface Person {
   id: string;
@@ -281,8 +293,10 @@ export async function seedDemoData(now = new Date()): Promise<SeedSummary> {
   await connectToDB();
   await Promise.all([User.init(), Idea.init(), Vote.init()]);
 
-  // Idempotent: clear only what a previous seed (or demo session) left behind
-  for (const person of PEOPLE) await deleteUserData(person.id);
+  // Idempotent: clear what a previous seed (or demo session) left behind.
+  // Safe in parallel: each call only takes its own user's votes back off
+  // the counters, with $inc.
+  await Promise.all(PEOPLE.map((person) => deleteUserData(person.id)));
 
   const users = await User.insertMany(
     PEOPLE.map((person) => ({
@@ -298,41 +312,52 @@ export async function seedDemoData(now = new Date()): Promise<SeedSummary> {
   let replyCount = 0;
   const votes: { idea: unknown; user: unknown; createdAt: Date }[] = [];
 
-  async function insertReplies(
-    parent: any,
-    replies: Reply[],
-    parentTime: number,
-  ) {
+  // Build every idea and reply in memory with its _id up front, then write
+  // them in one insertMany. Same documents, children and per-user idea order
+  // as inserting them one by one.
+  const ideaDocs: IdeaDoc[] = [];
+  const ideasByAuthor = new Map<string, mongoose.Types.ObjectId[]>();
+
+  function addIdea(fields: Omit<IdeaDoc, "_id" | "children">) {
+    const doc: IdeaDoc = {
+      _id: new mongoose.Types.ObjectId(),
+      ...fields,
+      children: [],
+    };
+    ideaDocs.push(doc);
+    const authorId = String(fields.author);
+    const authored = ideasByAuthor.get(authorId) ?? [];
+    authored.push(doc._id);
+    ideasByAuthor.set(authorId, authored);
+    return doc;
+  }
+
+  function addReplies(parent: IdeaDoc, replies: Reply[], parentTime: number) {
     for (const reply of replies) {
       const createdAt = parentTime + reply.minutesAfter * MINUTE;
       const author = userByName.get(reply.by)!;
-      const doc = await Idea.create({
+      const doc = addIdea({
         text: reply.text,
         author: author._id,
         parentID: String(parent._id),
         createdAt: new Date(createdAt),
       });
       replyCount += 1;
-      await Idea.updateOne(
-        { _id: parent._id },
-        { $push: { children: doc._id } },
-      );
-      await User.updateOne({ _id: author._id }, { $push: { ideas: doc._id } });
-      if (reply.replies) await insertReplies(doc, reply.replies, createdAt);
+      parent.children.push(doc._id);
+      if (reply.replies) addReplies(doc, reply.replies, createdAt);
     }
   }
 
   for (const [index, seed] of IDEAS.entries()) {
     const author = userByName.get(seed.by)!;
     const createdAt = now.getTime() - seed.hoursAgo * HOUR;
-    const idea = await Idea.create({
+    const idea = addIdea({
       text: seed.text,
       author: author._id,
       createdAt: new Date(createdAt),
       upvotes: seed.upvotes,
     });
     ideaCount += 1;
-    await User.updateOne({ _id: author._id }, { $push: { ideas: idea._id } });
 
     // Voters: the visitor when flagged, then other people in a rotating
     // order so the same few names do not vote on everything
@@ -362,9 +387,18 @@ export async function seedDemoData(now = new Date()): Promise<SeedSummary> {
       }),
     );
 
-    if (seed.replies) await insertReplies(idea, seed.replies, createdAt);
+    if (seed.replies) addReplies(idea, seed.replies, createdAt);
   }
 
+  await Idea.insertMany(ideaDocs);
+  await User.bulkWrite(
+    [...ideasByAuthor].map(([authorId, ideaIds]) => ({
+      updateOne: {
+        filter: { _id: authorId },
+        update: { $push: { ideas: { $each: ideaIds } } },
+      },
+    })),
+  );
   await Vote.insertMany(votes);
 
   return {

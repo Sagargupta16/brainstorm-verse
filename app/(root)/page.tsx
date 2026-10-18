@@ -8,9 +8,9 @@ const SORT_LABELS = { hot: "Hot", new: "New", top: "Top" } as const;
 
 export default async function Home({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<{ sort?: string }>;
-}) {
+}>) {
   const sort = parseFeedSort((await searchParams).sort);
   const [result, viewer] = await Promise.all([
     fetchPosts(1, 30, sort),

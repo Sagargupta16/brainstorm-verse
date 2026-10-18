@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 // Escape user input before it goes into a MongoDB $regex, so "c++" or ".*"
 // match literally instead of becoming a pattern (or a slow one)
 export function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }
 
 // created by chatgpt

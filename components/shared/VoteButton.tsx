@@ -13,7 +13,12 @@ interface Props {
   redirectTo: string | null;
 }
 
-function VoteButton({ ideaId, upvotes, hasVoted, redirectTo }: Props) {
+function VoteButton({
+  ideaId,
+  upvotes,
+  hasVoted,
+  redirectTo,
+}: Readonly<Props>) {
   const pathname = usePathname();
   const router = useRouter();
   const [, startTransition] = useTransition();

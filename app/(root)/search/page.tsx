@@ -7,9 +7,9 @@ import { getViewer } from "@/lib/viewer";
 
 export default async function SearchPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: Promise<{ q?: string }>;
-}) {
+}>) {
   const query = ((await searchParams).q ?? "").trim().slice(0, 100);
   const [users, ideas, viewer] = await Promise.all([
     searchUsers(query, 8),
