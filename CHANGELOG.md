@@ -9,7 +9,7 @@
 - Bump next 16.4.2, react/react-dom 19.3.1, @clerk/nextjs 7.9, mongoose 9.11, zod 4.6, react-hook-form 7.90, eslint 10.13, prettier 3.9.10
 - Majors: TypeScript 6.0 (tsconfig target es5 to ES2017, which TS 6 requires), @hookform/resolvers 5, tailwind-merge 3 (the v2 line targets Tailwind v3), @types/react and @types/react-dom 19, @types/node 24
 - Remove unused `svix` and `lucide-react`
-- CI: Node 24, `permissions: contents: read`, `npm ci --ignore-scripts` (clears both open code scanning alerts); `.nvmrc` 19 to 24
+- CI: Node 24, `permissions: contents: read`, `npm ci --ignore-scripts` (targets both open code scanning alerts); `.nvmrc` 19 to 24
 - `.editorconfig` indent 3 to 2 to match the code
 - README: architecture diagram, data model, request flow, tech decisions, project status, CI and license badges; drop the yarn/pnpm and Lucide claims
 - CLAUDE.md: correct stack versions, env var names, CI and proxy notes

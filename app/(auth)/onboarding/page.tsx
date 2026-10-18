@@ -11,10 +11,10 @@ async function Page() {
   const userData = {
     id: user.id,
     objectId: userInfo?._id?.toString() || "",
-    username: userInfo?.username || user?.username || "",
-    name: userInfo?.name || user?.firstName || "",
+    username: userInfo?.username || user.username || "",
+    name: userInfo?.name || user.firstName || "",
     bio: userInfo?.bio || "",
-    image: userInfo?.image || user?.imageUrl || "",
+    image: userInfo?.image || user.imageUrl || "",
   };
   return (
     <main className="mx-auto flex max-w-3xl flex-col justify-start px-6 py-20 sm:px-10">

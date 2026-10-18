@@ -37,7 +37,7 @@ Everything runs inside one Next.js 16 App Router app. There is no separate REST 
 ```mermaid
 flowchart LR
   B["Browser"] --> P["proxy.ts<br/>clerkMiddleware"]
-  P -->|"public: /, /sign-in, /sign-up"| RSC["Server Components<br/>app/(root), app/(auth)"]
+  P -->|"public: /, /sign-in, /sign-up, /api/webhook/clerk"| RSC["Server Components<br/>app/(root), app/(auth)"]
   P -->|"other routes: auth.protect()"| RSC
   RSC -->|"fetchPosts, fetchUser"| SA["Server actions<br/>lib/actions"]
   F["Client forms<br/>react-hook-form + Zod"] -->|"createIdea, updateUser"| SA
@@ -74,7 +74,7 @@ flowchart LR
 
 Working today: sign-up and sign-in, onboarding with photo upload (revisiting `/onboarding` edits the saved profile), posting an idea, and the home feed.
 
-Not built yet: the sidebar links to `/search`, `/activity`, `/communities` and `/profile`, and the reply link on each card (`/idea/[id]`), have no pages behind them yet. The right sidebar's "Suggested Communities" and "Suggested Users" are placeholders, and the top bar's `OrganizationSwitcher` needs Organizations enabled in the Clerk dashboard.
+Not built yet: the sidebar links to `/search`, `/activity`, `/communities` and `/profile`, and the reply and author links on each card (`/idea/[id]`, `/profile/[id]`), have no pages behind them yet. The right sidebar's "Suggested Communities" and "Suggested Users" are placeholders, and the top bar's `OrganizationSwitcher` needs Organizations enabled in the Clerk dashboard.
 
 ## 🛠️ Getting Started
 
