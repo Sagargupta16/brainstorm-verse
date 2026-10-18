@@ -168,7 +168,7 @@ Open [http://localhost:3000](http://localhost:3000). The first run downloads a M
    CLERK_WEBHOOK_SIGNING_SECRET=whsec_your_signing_secret
    ```
 
-   Optional: `npm run seed` loads the demo dataset into that database. It only replaces the seeded `seed_*` users, the Demo Visitor and their ideas, and leaves everything else alone.
+   Optional: `npm run seed` loads the demo dataset into that database. It replaces the seeded `seed_*` users and the Demo Visitor with the same cleanup the webhook runs, so their ideas go along with any replies under those ideas and the votes on them, including replies and votes from real users. Other ideas and users are left alone.
 
    For the webhook, add an endpoint at `https://<your-domain>/api/webhook/clerk` in the Clerk dashboard (Webhooks), subscribe it to `user.deleted`, and copy its signing secret into `CLERK_WEBHOOK_SIGNING_SECRET`. See [Clerk's webhook sync guide](https://clerk.com/docs/guides/development/webhooks/syncing).
 

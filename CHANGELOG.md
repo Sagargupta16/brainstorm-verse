@@ -8,7 +8,7 @@
 - Right sidebar "Suggested Users" now lists the most upvoted authors
 - Clerk webhook at `/api/webhook/clerk`: verifies the signature with `verifyWebhook` and, on `user.deleted`, removes the user, their ideas, the replies under them and the related votes, with upvote counters corrected
 - Demo mode (`NEXT_PUBLIC_DEMO_MODE=true`) runs the app without Clerk as a seeded Demo Visitor; `npm run demo` starts an in-memory MongoDB, seeds it and runs `next dev`
-- `npm run seed` loads the demo dataset (9 users, 12 ideas, 16 replies, 53 upvotes) into `MONGODB_URL`, replacing only seed-owned data
+- `npm run seed` loads the demo dataset (9 users, 12 ideas, 16 replies, 53 upvotes) into `MONGODB_URL`, replacing the seed-owned users and their ideas (replies and votes under those ideas go with them)
 - `npm run screenshots` captures desktop and phone screenshots with Playwright into `docs/screenshots/` as WebP; README now shows them
 - Pages and actions read the session through `lib/session.ts`; `proxy.ts` makes idea, profile and search pages public to read
 - Fix `/create-idea` passing a Mongo ObjectId to a client component (React rejected it); it now passes the id string

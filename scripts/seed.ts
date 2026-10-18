@@ -1,6 +1,7 @@
 // npm run seed: load the demo dataset into the database in MONGODB_URL
-// (read from the environment or .env.local). Only seed-owned users and their
-// ideas are replaced; anything else in the database is left alone.
+// (read from the environment or .env.local). Seed-owned users are removed
+// with deleteUserData first, which also drops any replies under their ideas
+// and the votes on those, even from real users. Other ideas are left alone.
 import mongoose from "mongoose";
 import { seedDemoData } from "./seed-data";
 
