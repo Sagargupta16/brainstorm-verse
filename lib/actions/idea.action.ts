@@ -15,7 +15,7 @@ interface Params {
 
 export async function createIdea({ text, author, communityId, path }: Params) {
   try {
-    connectToDB();
+    await connectToDB();
 
     const { userId: sessionUserId } = await auth();
     if (!sessionUserId) throw new Error("Unauthorized");
@@ -42,7 +42,7 @@ export async function createIdea({ text, author, communityId, path }: Params) {
 }
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
-  connectToDB();
+  await connectToDB();
 
   const skipAmount = (pageNumber - 1) * pageSize;
 

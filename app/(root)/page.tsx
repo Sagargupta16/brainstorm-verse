@@ -21,7 +21,7 @@ export default async function Home() {
                 key={post.id}
                 id={post.id}
                 currentUserId={user?.id || ""}
-                parentId={post.parentId}
+                parentId={post.parentID}
                 content={post.text}
                 author={post.author}
                 community={post.community}
@@ -29,7 +29,6 @@ export default async function Home() {
                 comments={post.children}
               />
             ))}
-            ;
           </>
         )}
       </section>

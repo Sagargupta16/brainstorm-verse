@@ -27,7 +27,7 @@ export async function updateUser({
     throw new Error("Unauthorized");
   }
 
-  connectToDB();
+  await connectToDB();
 
   try {
     await User.findOneAndUpdate(
@@ -52,7 +52,7 @@ export async function updateUser({
 
 export async function fetchUser(userId: string) {
   try {
-    connectToDB();
+    await connectToDB();
     return await User.findOne({ id: userId });
     // .populate({
     //   path: "communities",

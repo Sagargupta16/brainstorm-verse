@@ -6,6 +6,8 @@ A modern idea-sharing platform where creativity meets collaboration. Share your 
 ![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat-square&logo=typescript)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=flat-square&logo=tailwind-css)
 ![Mongoose](https://img.shields.io/badge/Mongoose-green?style=flat-square&logo=mongoose)
+[![CI](https://github.com/Sagargupta16/brainstorm-verse/actions/workflows/ci.yml/badge.svg)](https://github.com/Sagargupta16/brainstorm-verse/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 ## ✨ Features
 
@@ -25,16 +27,63 @@ A modern idea-sharing platform where creativity meets collaboration. Share your 
 - **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
 - **File Uploads**: [UploadThing](https://uploadthing.com/)
 - **Form Handling**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
-- **Icons**: [Lucide React](https://lucide.dev/)
+- **Icons**: SVG assets in `public/assets/`
+- **CI**: GitHub Actions (lint + production build), CodeQL, Renovate
+
+## Architecture
+
+Everything runs inside one Next.js 16 App Router app. There is no separate REST API: pages are React Server Components that read through server actions, and forms call the same server actions to write.
+
+```mermaid
+flowchart LR
+  B["Browser"] --> P["proxy.ts<br/>clerkMiddleware"]
+  P -->|"public: /, /sign-in, /sign-up, /api/webhook/clerk"| RSC["Server Components<br/>app/(root), app/(auth)"]
+  P -->|"other routes: auth.protect()"| RSC
+  RSC -->|"fetchPosts, fetchUser"| SA["Server actions<br/>lib/actions"]
+  F["Client forms<br/>react-hook-form + Zod"] -->|"createIdea, updateUser"| SA
+  SA -->|"auth() session check"| CL[("Clerk")]
+  SA -->|"Mongoose, cached connection"| DB[("MongoDB")]
+  F -->|"profile photo"| UT["app/api/uploadthing<br/>file router"]
+  UT -->|"Clerk user required, 1 image, 4MB"| UTS[("UploadThing storage")]
+```
+
+### Data model
+
+| Model  | Fields                                                                                    | Notes                                                                                         |
+| ------ | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `User` | `id` (Clerk user id), `username` (unique), `name`, `image`, `bio`, `onboarded`, `ideas[]` | Mirrors the Clerk user; written by `updateUser` during onboarding                             |
+| `Idea` | `text`, `author` -> User, `community`, `parentID`, `children[]` -> Idea, `createdAt`      | Self-referencing, so replies are Ideas with a `parentID`; the feed shows top-level ideas only |
+
+### How posting an idea works
+
+1. `/create-idea` (server component) loads the Clerk user, looks up the Mongo profile, and redirects to `/onboarding` until the profile is marked `onboarded`.
+2. `PostIdea` validates the text with Zod (3 characters minimum) in the browser.
+3. The `createIdea` server action re-checks the Clerk session, resolves the session user's Mongo `_id`, and rejects the write if it does not match the submitted author, so a client cannot post as someone else.
+4. The idea is saved, its id is pushed onto `User.ideas`, and the path is revalidated.
+5. The home feed (`fetchPosts`) pages through top-level ideas newest first and populates each author.
+
+### Tech decisions
+
+- **Server actions instead of API routes**: one typed call path for reads and writes, with authorization enforced on the server in each action.
+- **Clerk**: hosted sign-in and sign-up, session checks in `proxy.ts` and again inside every mutating action.
+- **Cached Mongoose connection** (`lib/mongoose.ts`): reused across action calls instead of reconnecting per request.
+- **UploadThing**: the browser uploads the profile photo straight to storage; the file router only accepts it for a signed-in Clerk user.
+- **Tailwind CSS v4, CSS-first**: theme tokens and component utilities live in `app/globals.css` (`@theme`, `@utility`), so there is no `tailwind.config.js`.
+
+### Project status
+
+Working today: sign-up and sign-in, onboarding with photo upload (revisiting `/onboarding` edits the saved profile), posting an idea, and the home feed.
+
+Not built yet: the sidebar links to `/search`, `/activity`, `/communities` and `/profile`, and the reply and author links on each card (`/idea/[id]`, `/profile/[id]`), have no pages behind them yet. The right sidebar's "Suggested Communities" and "Suggested Users" are placeholders, and the top bar's `OrganizationSwitcher` needs Organizations enabled in the Clerk dashboard.
 
 ## 🛠️ Getting Started
 
 ### Prerequisites
 
-- Node.js 20.9 or later
-- npm, yarn, or pnpm
-- MongoDB database
-- Clerk account for authentication
+- Node.js 24 (pinned in `.nvmrc`; Next.js 16 needs 20.9 or later)
+- npm (`package-lock.json` is the committed lockfile)
+- A MongoDB database (local or Atlas)
+- A Clerk application and an UploadThing app
 
 ### Installation
 
@@ -48,25 +97,21 @@ A modern idea-sharing platform where creativity meets collaboration. Share your 
 2. **Install dependencies**
 
    ```bash
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
+   npm ci
    ```
 
 3. **Set up environment variables**
-   
-   Create a `.env.local` file in the root directory:
+
+   Copy `.env.example` to `.env.local` and fill in the values:
 
    ```env
    # Clerk Authentication
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
    CLERK_SECRET_KEY=your_clerk_secret_key
-   
+
    # Database
    MONGODB_URL=your_mongodb_connection_string
-   
+
    # UploadThing
    UPLOADTHING_TOKEN=your_uploadthing_token
    ```
@@ -75,14 +120,10 @@ A modern idea-sharing platform where creativity meets collaboration. Share your 
 
    ```bash
    npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
    ```
 
 5. **Open your browser**
-   
+
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
 ## 📁 Project Structure
@@ -125,6 +166,7 @@ brainstorm-verse/
 - `npm run build` - Build the application for production
 - `npm run start` - Start the production server
 - `npm run lint` - Run ESLint for code quality
+- `npx tsc --noEmit` - Type-check without building
 - `npm run format` - Format code with Prettier
 
 ## 🤝 Contributing
@@ -168,13 +210,13 @@ npx create-next-app@latest ./
 **Configuration Options:**
 
 - TypeScript: Yes
-- TailwindCSS: Yes  
+- TailwindCSS: Yes
 - App Router: Yes
 
 ### 📦 Core Dependencies Installation
 
 ```bash
-npm install @clerk/nextjs @uploadthing/react mongoose svix uploadthing
+npm install @clerk/nextjs @uploadthing/react mongoose uploadthing
 ```
 
 **Key Dependencies Explained:**
@@ -182,7 +224,6 @@ npm install @clerk/nextjs @uploadthing/react mongoose svix uploadthing
 - **@clerk/nextjs**: Developer-first identity and user management system providing complete authentication, authorization, and user profiles
 - **uploadthing**: File upload service with simple API and React components for handling user file uploads
 - **mongoose**: MongoDB object modeling tool designed for asynchronous environments with promise and callback support
-- **svix**: Service for sending webhooks with simple API and React components
 
 ### 🎨 UI Setup
 
@@ -195,7 +236,7 @@ npm install tailwindcss-animate
 **Setup Steps:**
 
 - Customize `app/globals.css` according to your design needs
-- Configure `tailwind.config.js` for your styling requirements
+- Tailwind CSS v4 is configured in CSS: theme tokens and utilities live in `app/globals.css` (there is no `tailwind.config.js`)
 - Clean up default content in `app/page.tsx`
 
 ### 📁 Folder Structure Setup
@@ -205,8 +246,8 @@ npm install tailwindcss-animate
 - **Auth Routes**: Authentication-related pages
   - Sign-in, Sign-up, Onboarding pages
   - Uses Next.js route groups `(auth)`
-  
-- **Root Routes**: Main application pages  
+
+- **Root Routes**: Main application pages
   - Home, Create Idea, and other core features
   - Uses Next.js route groups `(root)`
 
@@ -245,7 +286,7 @@ For detailed UploadThing setup, refer to this comprehensive tutorial:
 **Key Setup Steps:**
 
 1. Create UploadThing account
-2. Configure API keys in environment variables
+2. Put the app token in `UPLOADTHING_TOKEN`
 3. Set up file upload endpoints
 4. Integrate upload components in your forms
 
