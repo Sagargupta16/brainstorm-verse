@@ -9,6 +9,23 @@ A modern idea-sharing platform where creativity meets collaboration. Share your 
 [![CI](https://github.com/Sagargupta16/brainstorm-verse/actions/workflows/ci.yml/badge.svg)](https://github.com/Sagargupta16/brainstorm-verse/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
+Try it with no accounts or keys:
+
+```bash
+npm ci
+npm run demo   # in-memory MongoDB, seeded data, http://localhost:3000
+```
+
+| Feed (desktop)                                             | Thread (desktop)                                                |
+| ---------------------------------------------------------- | --------------------------------------------------------------- |
+| ![Hot feed on desktop](docs/screenshots/feed-desktop.webp) | ![Idea thread on desktop](docs/screenshots/thread-desktop.webp) |
+
+| Feed (phone)                                                                       | Profile (phone)                                                                           |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| <img src="docs/screenshots/feed-phone.webp" alt="Hot feed on a phone" width="300"> | <img src="docs/screenshots/profile-phone.webp" alt="Profile page on a phone" width="300"> |
+
+Screenshots come from `npm run demo` and are regenerated with `npm run screenshots`.
+
 ## ✨ Features
 
 - 🔐 **Secure Authentication** - Powered by Clerk for seamless user management
@@ -17,6 +34,12 @@ A modern idea-sharing platform where creativity meets collaboration. Share your 
 - 📱 **Responsive Design** - Beautiful UI that works on all devices
 - 🎨 **Modern Interface** - Clean design with TailwindCSS and shadcn/ui components
 - 📁 **Photo Uploads** - Upload your profile photo using UploadThing
+- **Upvotes with Hot, New and Top feeds** - one vote per person, enforced by a unique index; Hot uses a Hacker News style time decay computed inside MongoDB
+- **Threaded replies** - every idea has a page (`/idea/[id]`) with its replies, and replies can be replied to
+- **Profiles** - `/profile/[id]` shows a person's ideas and replies with idea, reply and upvote counts; `/profile/edit` edits your own
+- **Activity and search** - `/activity` lists replies to and upvotes on your ideas; `/search` finds people and ideas
+- **Demo mode** - `npm run demo` runs the full app without Clerk, MongoDB Atlas or UploadThing
+- **Clerk webhook** - deleting a user in Clerk removes their profile, ideas, threads and votes from MongoDB, behind signature verification
 
 ## 🚀 Tech Stack
 
@@ -37,22 +60,25 @@ Everything runs inside one Next.js 16 App Router app. There is no separate REST 
 ```mermaid
 flowchart LR
   B["Browser"] --> P["proxy.ts<br/>clerkMiddleware"]
-  P -->|"public: /, /sign-in, /sign-up, /api/webhook/clerk"| RSC["Server Components<br/>app/(root), app/(auth)"]
+  P -->|"public: /, /idea, /profile, /search, sign-in, sign-up, webhook"| RSC["Server Components<br/>app/(root), app/(auth)"]
   P -->|"other routes: auth.protect()"| RSC
-  RSC -->|"fetchPosts, fetchUser"| SA["Server actions<br/>lib/actions"]
-  F["Client forms<br/>react-hook-form + Zod"] -->|"createIdea, updateUser"| SA
-  SA -->|"auth() session check"| CL[("Clerk")]
-  SA -->|"Mongoose, cached connection"| DB[("MongoDB")]
+  RSC -->|"fetchPosts, fetchIdeaById, fetchActivity"| SA["Server actions<br/>lib/actions"]
+  F["Client forms and VoteButton<br/>react-hook-form + Zod"] -->|"createIdea, addReply, setVote, updateUser"| SA
+  SA -->|"lib/session.ts"| CL[("Clerk session<br/>or demo visitor")]
+  SA -->|"Mongoose, cached connection"| DB[("MongoDB<br/>users, ideas, votes")]
   F -->|"profile photo"| UT["app/api/uploadthing<br/>file router"]
-  UT -->|"Clerk user required, 1 image, 4MB"| UTS[("UploadThing storage")]
+  UT -->|"signed-in user, 1 image, 4MB"| UTS[("UploadThing storage")]
+  CW["Clerk webhook<br/>user.deleted"] -->|"verifyWebhook signature"| WH["app/api/webhook/clerk"]
+  WH -->|"lib/user-cleanup.ts"| DB
 ```
 
 ### Data model
 
-| Model  | Fields                                                                                    | Notes                                                                                         |
-| ------ | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `User` | `id` (Clerk user id), `username` (unique), `name`, `image`, `bio`, `onboarded`, `ideas[]` | Mirrors the Clerk user; written by `updateUser` during onboarding                             |
-| `Idea` | `text`, `author` -> User, `community`, `parentID`, `children[]` -> Idea, `createdAt`      | Self-referencing, so replies are Ideas with a `parentID`; the feed shows top-level ideas only |
+| Model  | Fields                                                                                          | Notes                                                                                                                 |
+| ------ | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `User` | `id` (Clerk user id), `username` (unique), `name`, `image`, `bio`, `onboarded`, `ideas[]`       | Mirrors the Clerk user; written by `updateUser` during onboarding                                                     |
+| `Idea` | `text`, `author` -> User, `community`, `parentID`, `children[]` -> Idea, `upvotes`, `createdAt` | Self-referencing, so replies are Ideas with a `parentID`; the feed shows top-level ideas only; `upvotes` is a counter |
+| `Vote` | `idea` -> Idea, `user` -> User, `createdAt`                                                     | Unique index on `(idea, user)`, so one person can upvote an idea once                                                 |
 
 ### How posting an idea works
 
@@ -60,7 +86,19 @@ flowchart LR
 2. `PostIdea` validates the text with Zod (3 characters minimum) in the browser.
 3. The `createIdea` server action re-checks the Clerk session, resolves the session user's Mongo `_id`, and rejects the write if it does not match the submitted author, so a client cannot post as someone else.
 4. The idea is saved, its id is pushed onto `User.ideas`, and the path is revalidated.
-5. The home feed (`fetchPosts`) pages through top-level ideas newest first and populates each author.
+5. The home feed (`fetchPosts`) pages through top-level ideas in the chosen order (Hot by default) and populates each author.
+
+### How voting and ranking work
+
+- **One vote per person.** A vote is its own `Vote` document, and a unique index on `(idea, user)` makes the database reject a second one. Two racing clicks cannot both count, because the second insert fails with a duplicate-key error.
+- **Idempotent action.** `setVote({ ideaId, voted })` sets the state rather than toggling it: `voted: true` inserts (a duplicate is a no-op), `voted: false` deletes. `Idea.upvotes` moves with `$inc` only when a Vote document was actually inserted or deleted, so retries never drift the counter.
+- **Optimistic UI.** `VoteButton` flips the heart and count with React's `useOptimistic`, then the revalidated server props replace it (or roll it back if the action throws).
+- **Hot ranking.** `score = (upvotes + 1) / (ageHours + 2) ^ 1.8`, the Hacker News shape. The +1 lets a brand-new idea rank on freshness alone, and the 1.8 gravity makes old ideas sink unless votes keep up. `lib/ranking.ts` builds the same formula as an aggregation expression, so MongoDB scores, sorts and pages, and only the page of ids is hydrated.
+- **Top** sorts by `upvotes` then `createdAt`; **New** by `createdAt`. Compound indexes on `Idea` cover the feed, Top and per-author profile queries.
+
+### Demo mode
+
+`NEXT_PUBLIC_DEMO_MODE=true` swaps Clerk out: `proxy.ts` lets every request through, `AuthProvider` skips `ClerkProvider`, and `lib/session.ts` answers every "who is this" with the seeded Demo Visitor. Server actions still go through the same session helper and ownership checks, so demo mode exercises the real write paths. `npm run demo` sets this flag, starts MongoDB in memory with `mongodb-memory-server-core`, seeds it (9 users, 12 ideas, 16 replies, 53 upvotes), and runs `next dev`. Anyone who opens a demo deployment acts as that one shared account, so use it for local runs and throwaway previews, not for real users.
 
 ### Tech decisions
 
@@ -72,11 +110,22 @@ flowchart LR
 
 ### Project status
 
-Working today: sign-up and sign-in, onboarding with photo upload (revisiting `/onboarding` edits the saved profile), posting an idea, and the home feed.
+Working today: sign-up and sign-in, onboarding with photo upload (revisiting `/onboarding` or `/profile/edit` edits the saved profile), posting an idea, the Hot/New/Top feed with upvotes, idea threads with replies, profiles, activity, search, the "Suggested Users" sidebar (most upvoted authors), the Clerk `user.deleted` webhook, and demo mode.
 
-Not built yet: the sidebar links to `/search`, `/activity`, `/communities` and `/profile`, and the reply and author links on each card (`/idea/[id]`, `/profile/[id]`), have no pages behind them yet. The right sidebar's "Suggested Communities" and "Suggested Users" are placeholders, and the top bar's `OrganizationSwitcher` needs Organizations enabled in the Clerk dashboard.
+Not built yet: `/communities` (the sidebar link is a 404) and the "Suggested Communities" sidebar block, the profile "Tagged" tab, and pagination past the first 30 feed ideas. The top bar's `OrganizationSwitcher` needs Organizations enabled in the Clerk dashboard.
 
 ## 🛠️ Getting Started
+
+### Quick look: demo mode
+
+```bash
+git clone https://github.com/Sagargupta16/brainstorm-verse.git
+cd brainstorm-verse
+npm ci
+npm run demo
+```
+
+Open [http://localhost:3000](http://localhost:3000). The first run downloads a MongoDB binary for `mongodb-memory-server-core`. Set `PORT` to use another port. Everything is in memory and is gone when the process stops. Photo uploads need an UploadThing token, so they do not work in demo mode.
 
 ### Prerequisites
 
@@ -114,7 +163,14 @@ Not built yet: the sidebar links to `/search`, `/activity`, `/communities` and `
 
    # UploadThing
    UPLOADTHING_TOKEN=your_uploadthing_token
+
+   # Clerk webhook (optional, for user.deleted cleanup)
+   CLERK_WEBHOOK_SIGNING_SECRET=whsec_your_signing_secret
    ```
+
+   Optional: `npm run seed` loads the demo dataset into that database. It only replaces the seeded `seed_*` users, the Demo Visitor and their ideas, and leaves everything else alone.
+
+   For the webhook, add an endpoint at `https://<your-domain>/api/webhook/clerk` in the Clerk dashboard (Webhooks), subscribe it to `user.deleted`, and copy its signing secret into `CLERK_WEBHOOK_SIGNING_SECRET`. See [Clerk's webhook sync guide](https://clerk.com/docs/guides/development/webhooks/syncing).
 
 4. **Run the development server**
 
@@ -126,6 +182,12 @@ Not built yet: the sidebar links to `/search`, `/activity`, `/communities` and `
 
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
+### Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FSagargupta16%2Fbrainstorm-verse&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY,MONGODB_URL,UPLOADTHING_TOKEN&envDescription=Clerk%20keys%2C%20a%20MongoDB%20connection%20string%20and%20an%20UploadThing%20token&envLink=https%3A%2F%2Fgithub.com%2FSagargupta16%2Fbrainstorm-verse%2Fblob%2Fmain%2F.env.example)
+
+The button clones the repo into your Vercel account and asks for the four variables in `.env.example`. A MongoDB Atlas free cluster works for `MONGODB_URL`; run `npm run seed` against it once for starter content. For a read-and-play preview without Clerk, set `NEXT_PUBLIC_DEMO_MODE=true` and `MONGODB_URL` only (see [Demo mode](#demo-mode) for the shared-account caveat).
+
 ## 📁 Project Structure
 
 ```text
@@ -136,21 +198,31 @@ brainstorm-verse/
 │   │   ├── sign-in/
 │   │   └── sign-up/
 │   ├── (root)/           # Main application routes
+│   │   ├── activity/
 │   │   ├── create-idea/
-│   │   └── page.tsx
-│   └── api/              # API routes
+│   │   ├── idea/[id]/    # Idea thread with replies
+│   │   ├── profile/      # /profile, /profile/[id], /profile/edit
+│   │   ├── search/
+│   │   └── page.tsx      # Hot / New / Top feed
+│   └── api/              # uploadthing, webhook/clerk
 ├── components/
-│   ├── cards/            # Reusable card components
-│   ├── forms/            # Form components
-│   ├── shared/           # Shared layout components
+│   ├── cards/            # IdeaCard, IdeaList
+│   ├── forms/            # Profile, idea and reply forms
+│   ├── shared/           # Layout, VoteButton, ProfileHeader, AuthProvider
 │   └── ui/               # shadcn/ui components
 ├── constants/            # Navigation and tab constants
+├── docs/screenshots/     # README screenshots (npm run screenshots)
 ├── lib/
 │   ├── actions/          # Server actions
-│   ├── models/           # Database models
+│   ├── models/           # User, Idea, Vote
 │   ├── validations/      # Zod schemas
+│   ├── demo.ts           # Demo mode flag
+│   ├── ranking.ts        # Hot score, in TypeScript and as a MongoDB expression
+│   ├── session.ts        # Clerk session or demo visitor
+│   ├── user-cleanup.ts   # Used by the Clerk webhook
 │   └── utils.ts          # Utility functions
-└── public/               # Static assets
+├── public/               # Static assets (demo avatars in public/demo/)
+└── scripts/              # demo, seed, screenshots
 ```
 
 ## 🎯 Usage
@@ -159,10 +231,15 @@ brainstorm-verse/
 2. **Complete Onboarding**: Set up your profile with basic information and a photo
 3. **Create Ideas**: Share your thoughts and innovations with the community
 4. **Explore**: Browse ideas from other users on the home feed
+5. **Vote and reply**: Upvote ideas, switch the feed between Hot, New and Top, and reply on an idea's page
+6. **Follow up**: See replies and upvotes on your ideas in Activity, and find people or ideas in Search
 
 ## 🔧 Available Scripts
 
 - `npm run dev` - Start development server
+- `npm run demo` - Run the whole app with an in-memory, seeded MongoDB and no Clerk
+- `npm run seed` - Load the demo dataset into the database in `MONGODB_URL`
+- `npm run screenshots [url]` - Capture the README screenshots from a running app (needs `npx playwright install chromium`)
 - `npm run build` - Build the application for production
 - `npm run start` - Start the production server
 - `npm run lint` - Run ESLint for code quality
