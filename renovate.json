@@ -5,6 +5,16 @@
     {
       "matchUpdateTypes": ["major"],
       "enabled": true
+    },
+    {
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7",
+      "description": "TypeScript stays on 6.x. typescript-eslint 8.72.1 (latest on 2026-11-01) declares peer typescript '>=4.8.4 <6.1.0' and throws 'typescript-eslint does not support TS 7.0' when eslint-config-next loads it, so npm run lint fails. Remove once a stable typescript-eslint accepts TS 7 (typescript-eslint/typescript-eslint#10940)."
+    },
+    {
+      "matchPackageNames": ["effect"],
+      "allowedVersions": "<4",
+      "description": "The effect override stays on 3.x. uploadthing 7.7.4 (latest on 2026-11-01) pins effect 3.17.7, and forcing effect 4 breaks next build ('Can't resolve effect/ConfigError') and tsc (UploadedFileData.ufsUrl). Remove once uploadthing supports effect 4."
     }
   ]
 }
